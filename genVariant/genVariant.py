@@ -13,10 +13,16 @@ def varFinder(Directory,Outdir,Query):
 
   genes_path = Path(Directory)
   output_path = Path(Outdir)
+  query_type ="File"
   
+  #query must by a file or a directory with files
   try:                                 # If you don't offer a query path or an invalid one, then it won't add a query gene to the mix
-    query_path = Path(Query)    
-    if not query_path.is_file():
+    query_path = Path(Query)
+    if query_path.is_file():
+       query_type ="File"
+    elif query_path.is_dir():
+       query_type ="Dir"
+    else:
        query_path = ''       
   except TypeError:
     query_path = ''
@@ -28,9 +34,9 @@ def varFinder(Directory,Outdir,Query):
   current_files = 1
   #-----------------------------------------
 
-  genes = {}
+  genes = {}   # dictionary of all genes
   print ("Reading gene files...")
-  for file_path in genes_path.rglob('*.fasta'):
+  for file_path in genes_path.rglob('*.fasta'):   # We populate the dictionary with all the genes in the given directory
     if file_path.is_file():
        name, gene = genGetter(file_path)
        genes[name] = gene
@@ -38,11 +44,16 @@ def varFinder(Directory,Outdir,Query):
        current_files +=1
 
   grouped = defaultdict(list)            # its a factory function designed to create a dictionary whose values are type list
-  if query_path:                                          # If we have a queried gene to add then
-    print ("Adding Query to report!")
-    query_name, query_gene = genGetter(query_path)   # We start by initiating with the Queried Gene
-    grouped[query_gene].append(query_name)           # Then we add the queried gene to the final dictionary
-  
+  if query_type == "File":
+    if query_path:                                          # If we have a queried gene to add then
+      print ("Adding Query to report!")
+      query_name, query_gene = genGetter(query_path)   # We start by initiating with the Queried Gene
+      grouped[query_gene].append(query_name)           # Then we add the queried gene to the final dictionary
+  elif query_type == "Dir":
+     print ("Adding Queries to report!")
+     for file_path in query_path.rglob('*.fasta'):
+        query_name, query_gene = genGetter(file_path)   # We start by initiating with the Queried Genes
+        grouped[query_gene].append(query_name)           # Then we add the queried gene to the final dictionary
   
   for key, value in genes.items():       # dict.items() returns tuples of the key-value pairs of a dictionary
     grouped[value].append(key)           # it will create a dictionary with the gene as a key and a list of filenames as values
@@ -65,7 +76,7 @@ def varFinder(Directory,Outdir,Query):
      total_alleles = len(grouped)
      counter = 1  
      for key in grouped:
-        header = [">",grouped[key][0],"\n"]
+        header = [">",str(counter),"\n"]
         gene = [key,"\n"]
         fasta_file.write(''.join(header))
         fasta_file.write(''.join(gene))
