@@ -1,4 +1,4 @@
-This script is mean to search a group of genome assemblies for a single reference gene match, using BLAST and extract the gene, even if fragmented, if the matches are in the same contig. It will also give a report of allelic profiles based on complete nucleotide identity.
+This script is meant to search a group of genome assemblies for a single reference gene match, using BLAST and extract the gene, even if fragmented, if the matches are in the same contig. It will also give a report of allelic profiles based on complete nucleotide identity.
 
 USAGE
 main.py [assemblies_directory] [reference_gene_file] [reference_gene_extended_file] [Output_folder] [Start_offset] [End_offset]
